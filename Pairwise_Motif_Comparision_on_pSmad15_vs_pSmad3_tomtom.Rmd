@@ -1,0 +1,43 @@
+################################################################################
+### Pairwise_Motif_Comparison_on_pSmad15_vs_pSmad3_tomtom
+################################################################################
+#==============================================================
+## Inspired by: bernardo-de-almeida/motif-clustering
+#==============================================================
+https://github.com/bernardo-de-almeida/motif-clustering
+## set up
+setwd("E:/T4T/Pairwise_Motif_Comparison_on_pSmad15_vs_pSmad3_tomtom")
+
+library(data.table)
+library(reshape2)
+library(corrplot)
+library(gplots) # for heatmap.2 function.
+#==============================================================
+## load tomtom results
+#==============================================================
+# read.delim
+Tomtom <- read.delim("./Tomtom_pSmad15_vs_pSmad3.tsv")
+# reshape2::dcast
+simsq <- reshape2::dcast(Tomtom, Query_ID~Target_ID, value.var = "E.value") # It is a data.frame.
+# make data.frame with pSmad15/Query ID motif as rownames, pSmad3/Target ID motif as colname
+rownames(simsq) <- simsq$Query_ID
+simsq <- simsq[,-1]
+# -log10(E.value)
+mat = -log10(simsq)
+#================================================================================
+## corrplot on mat, i.e. -log10(E.value)
+#================================================================================
+# learn from: An Introduction to corrplot Package
+https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html
+# max
+max(mat)
+[1] 14.25216
+# change mat value to become[-1, 1]
+mat = -log10(simsq)/14.25216
+# as.matrix
+mat<-as.matrix(mat)
+# corrplot on mat: color
+png(paste0("pSmads_motif_pairwise_similarity_corrplot_mat_color.png"), type="cairo", width = 2000, height = 2000, res = 300)
+corrplot(mat, method = 'color')
+dev.off()
+
